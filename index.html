@@ -12,7 +12,7 @@
 </head>
 <body id="body">
 	<div id="onload"><p>LOADING</p></div>
-
+    <div id="audio"><p id="audiotext">UNMUTE</p><i id="audioi" class="fa fa-volume-off"></i></div>
 	<div id="rightcont"><i id="right" class="fa fa-chevron-right"></i></div>
 	<div id="upcont"><i id="up" class="fa fa-chevron-up"></i></div>
 	<div id="downcont"><i id="down" class="fa fa-chevron-down"></i></div>
@@ -20,11 +20,8 @@
 	<div id="container">
 		<i id="exit" class="fa fa-times"></i>
 		<p id="instructions1"><b>INSTRUCTIONS</b></p>
-		<p id="instructions"></p>
-		<p id="instructions">USE   'W', 'A', 'S', 'D'  TO MOVE IF YOU'RE USING A KEYBOARD</p>
-		<p id="instructions">USE THE ARROWS ON SCREEN IF YOU'RE ON MOBILE</p>
-		<p id="instructions" class="desktop">YOU CAN CLICK ON ICONS</p>
-		<p id="instructions"></p>
+		<p id="instructions" id="desktop-inst" >USE   'W', 'A', 'S', 'D'  TO MOVE IF YOU'RE USING A KEYBOARD</p>
+		<p id="instructions" id="mobile-inst" >USE THE ARROWS ON SCREEN IF YOU'RE ON MOBILE</p>
 		<p id="instructions"></p>
 	</div>
 	<div  class="links-cont">
@@ -52,6 +49,9 @@ var right = document.getElementById("right");
 var left = document.getElementById("left");
 var exit = document.getElementById("exit");
 var box = document.getElementById("container");
+var audio = document.getElementById("audio");
+var audioi = document.getElementById("audioi");
+var audiotext = document.getElementById("audiotext");
 
 const mouse = new THREE.Vector2();
 
@@ -432,7 +432,7 @@ const audioLoader = new THREE.AudioLoader();
 audioLoader.load( 'SOUNDS/lights.wav', function( buffer ) {
 	sound.setBuffer( buffer );
 	sound.setLoop( false );
-	sound.setVolume( 1 );
+	sound.setVolume( 0 );
 	
 });
 // create a global audio source
@@ -440,11 +440,28 @@ const sound2 = new THREE.Audio( listener );
 
 // load a sound and set it as the Audio object's buffer
 const audioLoader2 = new THREE.AudioLoader();
-audioLoader.load( 'SOUNDS/hit.wav', function( buffer ) {
+audioLoader.load( 'SOUNDS/hit.mp3', function( buffer ) {
 	sound2.setBuffer( buffer );
 	sound2.setLoop( false );
 	sound2.setVolume( 0.2 );
 });
+// create a global audio source
+const sound3 = new THREE.Audio( listener );
+
+// load a sound and set it as the Audio object's buffer
+const audioLoader3 = new THREE.AudioLoader();
+audioLoader.load( 'SOUNDS/backsound.mp3', function( buffer ) {
+	sound3.setBuffer( buffer );
+	sound3.setLoop( false );
+	sound3.setVolume( 0 );
+	playMusic();
+});
+function playMusic(){
+	sound3.play();
+	setTimeout(()=>{
+		sound3.play();
+	},62000);
+}
 //3d model
 const gltfloader = new THREE.GLTFLoader();
 let eaglemat =  new THREE.MeshPhysicalMaterial({
@@ -761,10 +778,11 @@ window.addEventListener('keyup',(e)=>{
 });
 Player.addEventListener('collide',(e)=>{
 	var relativeVelocity = e.contact.getImpactVelocityAlongNormal();
-    if(Math.abs(relativeVelocity) > 20 && e.body != ground){
-		sound2.setVolume(Math.abs(relativeVelocity)/300 - 0.5);
+    if(Math.abs(relativeVelocity) > 20 && e.body != ground && audioClicked){
+		console.log(Math.abs(relativeVelocity)/1000);
+		sound2.setVolume(Math.abs(relativeVelocity)/1000 - 0.5);
         sound2.play();
-		setTimeout(()=>{sound2.stop();},500);
+		setTimeout(()=>{sound2.stop();},300);
     }
 });
 window.addEventListener('touchstart',(e)=>{
@@ -800,7 +818,6 @@ exit.addEventListener('click',()=>{
 
 addEventListener('click',()=>{
 	if (WURFL.is_mobile === false) {
-
 		if(where == "github"){
 				window.location.assign("https://github.com/JawadKaraki");
 		}
@@ -811,6 +828,24 @@ addEventListener('click',()=>{
 				window.location.assign("https://wa.me/96181746168");
 		}
     }
+});
+//audio volume down
+var audioClicked = false;
+audio.addEventListener('click',()=>{
+	console.log("hello");
+	if(audioClicked){
+		sound.setVolume(0);
+		sound3.setVolume(0);
+		audioi.className = "fa fa-volume-off";
+		audiotext.innerHTML = "UNMUTE";
+		audioClicked = false;
+	}else{
+        sound.setVolume(0.2);
+		sound3.setVolume(0.2);
+		audioi.className = "fa fa-volume-up";
+		audiotext.innerHTML = "MUTE";
+		audioClicked = true;
+	}
 });
 
 </script>

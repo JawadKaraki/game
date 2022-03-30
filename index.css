@@ -17,6 +17,26 @@ canvas{
     
     
 }
+#audio{
+    position: absolute;
+    right: 50px;
+    top: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+#audio i{
+    z-index: 1000;
+    color: white;
+    font-size: 20px;
+    margin-left: 5px;
+}
+#audio p{
+    font-family: Saira;
+    z-index: 1000;
+    color: white;
+    font-size: 10px;
+}
 #text{
     z-index: 2;
     position: fixed;
@@ -104,6 +124,9 @@ i{
     display: flex;
     -ms-flex-pack: distribute;
         justify-content: space-around;
+}
+#yesorno p{
+    color: white;
 }
 #container{
     font-family: 'Saira', sans-serif;
@@ -250,6 +273,9 @@ i{
     #instructions{
         width: 60%;
         margin:auto;
+    }
+    #audio p{
+        display: none;
     }
 
 }
