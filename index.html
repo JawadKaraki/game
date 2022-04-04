@@ -443,7 +443,7 @@ const audioLoader2 = new THREE.AudioLoader();
 audioLoader.load( 'SOUNDS/hit.mp3', function( buffer ) {
 	sound2.setBuffer( buffer );
 	sound2.setLoop( false );
-	sound2.setVolume( 0.2 );
+	sound2.setVolume( 0 );
 });
 // create a global audio source
 const sound3 = new THREE.Audio( listener );
@@ -779,10 +779,10 @@ window.addEventListener('keyup',(e)=>{
 Player.addEventListener('collide',(e)=>{
 	var relativeVelocity = e.contact.getImpactVelocityAlongNormal();
     if(Math.abs(relativeVelocity) > 20 && e.body != ground && audioClicked){
-		console.log(Math.abs(relativeVelocity)/1000);
-		sound2.setVolume(Math.abs(relativeVelocity)/1000 - 0.5);
+		if(sound2.isPlaying){
+			sound2.stop();
+		}
         sound2.play();
-		setTimeout(()=>{sound2.stop();},300);
     }
 });
 window.addEventListener('touchstart',(e)=>{
@@ -835,13 +835,15 @@ audio.addEventListener('click',()=>{
 	console.log("hello");
 	if(audioClicked){
 		sound.setVolume(0);
+		sound2.setVolume(0);
 		sound3.setVolume(0);
 		audioi.className = "fa fa-volume-off";
 		audiotext.innerHTML = "UNMUTE";
 		audioClicked = false;
 	}else{
-        sound.setVolume(0.2);
-		sound3.setVolume(0.2);
+        sound.setVolume(0.3);
+		sound2.setVolume(0.3);
+		sound3.setVolume(0.3);
 		audioi.className = "fa fa-volume-up";
 		audiotext.innerHTML = "MUTE";
 		audioClicked = true;
