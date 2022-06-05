@@ -57,7 +57,7 @@ const mouse = new THREE.Vector2();
 
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x4FBDBA);
+scene.background = new THREE.Color(0x000000);
 const camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 10000 );
 const renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setSize( window.innerWidth, window.innerHeight );
@@ -167,6 +167,8 @@ let y = 0;
 //BOXES
 let boxesBW = [];
 let boxesbodyBW = [];
+//Torusos
+let Torusus = [];
 //mesh dominos
 let dominosmat =  new THREE.MeshPhysicalMaterial({
 	color: 0xAAAAAA,
@@ -271,14 +273,13 @@ meshleft.rotation.y = Math.PI/2;
 meshleft.position.set(-100,240,0);
 //cannon
 //Player
-let playerShape = new CANNON.Sphere(7);
+let playerShape = new CANNON.Sphere(15);
 let palyermat = new CANNON.Material();
 const Player = new CANNON.Body({mass:100,material:palyermat});
 Player.addShape(playerShape);
 world.add(Player);
 Player.position.set(0,5,200);
 //playerMesh
-let geoPlayer = new THREE.SphereGeometry(7);
 let matPlayer = new THREE.MeshPhysicalMaterial({
 	color: 0x909090,
 	transmission:0.1,
@@ -288,9 +289,18 @@ let matPlayer = new THREE.MeshPhysicalMaterial({
 	roughness:0.5,
 	normalScale: new THREE.Vector2(0.15,0.15)
 });
-let PlayerMesh = new THREE.Mesh(geoPlayer,matPlayer);
+let geo2Player = new THREE.TorusGeometry( 15, 1, 16, 100 );
+let PlayerMesh = new THREE.Mesh(geo2Player,matPlayer);
 PlayerMesh.castShadow = true;
 scene.add(PlayerMesh);
+//torus2
+let PlayerMesh2 = new THREE.Mesh(geo2Player,matPlayer);
+PlayerMesh2.castShadow = true;
+scene.add(PlayerMesh2);
+//torus3
+let PlayerMesh3 = new THREE.Mesh(geo2Player,matPlayer);
+PlayerMesh3.castShadow = true;
+scene.add(PlayerMesh3);
 //cannon
 //3d model physics head
 let modelShape = new CANNON.Box(new CANNON.Vec3(25,100,40));
@@ -418,8 +428,20 @@ let flyingmat =  new THREE.MeshPhysicalMaterial({
 let flyinggeo = new THREE.BoxGeometry(50,50,50);
 let flyingbox = new THREE.Mesh(flyinggeo,flyingmat);
 flyingbox.receiveShadow = true;
-flyingbox.position.set(0,50,1000);
+flyingbox.position.set(0,50,2000);
 scene.add(flyingbox);
+for(let t = 0;t<8;t++)
+{
+	    //flying toruses
+		let flyingtorusgeo = new THREE.TorusGeometry( 10, 0.6, 16, 100 );
+		let flyingtorus = new THREE.Mesh(flyingtorusgeo,flyingmat);
+		flyingtorus.receiveShadow = true;
+		flyingtorus.position.set(0,80,1200);
+		flyingtorus.rotation.set(Math.PI/2,0,0);
+		flyingtorus.scale.set(1-t,1-t,1-t);
+		scene.add(flyingtorus);
+		Torusus.push(flyingtorus);
+}
 //sound
 const listener = new THREE.AudioListener();
 camera.add( listener );
@@ -561,6 +583,7 @@ let secondPlace = 0;
 let thirdPlace = 0;
 let fourthPlace = 0;
 let fifthPlace = 0;
+let sixthPlace = 0;
 const speed = 0;
 const dragMagnitude = 0;
 const drag = 0;
@@ -570,7 +593,6 @@ function animate(){
 	let posC = camera.position;
 	renderer.render( scene, camera );
     world.step(1/60);
-
 	//raycast from mouse
 	raycaster.setFromCamera( mouse, camera );
 	const intersects = raycaster.intersectObjects( scene.children );
@@ -600,7 +622,7 @@ function animate(){
 	if(Player.position.x > 100) Player.position.x = 97;
 	if(Player.position.x < -100) Player.position.x = -97;
 	if(Player.position.z < -85) Player.position.z = -80;
-	if(Player.position.z > 2000) Player.position.z = 100;
+	if(Player.position.z > 2400) Player.position.z = 100;
 	//rotate the box
 	flyingbox.rotation.x += 0.01;
 	flyingbox.rotation.y += 0.01;
@@ -680,10 +702,23 @@ function animate(){
 	}
 	PlayerMesh.position.copy(Player.position);
 	PlayerMesh.quaternion.copy(Player.quaternion);
+	PlayerMesh2.position.copy(Player.position);
+	PlayerMesh2.quaternion.copy(Player.quaternion);
+	PlayerMesh2.rotation.x += Math.PI/3;
+	PlayerMesh2.rotation.y += Math.PI/3;
+	PlayerMesh3.position.copy(Player.position);
+	PlayerMesh3.quaternion.copy(Player.quaternion);
+	PlayerMesh3.rotation.x -= Math.PI/6;
+	PlayerMesh3.rotation.y += Math.PI/6;
 	mesh2.position.copy(ground.position);
 	mesh2.quaternion.copy(ground.quaternion);
 	meshwall1.position.copy(wall1.position);
 	meshwall1.quaternion.copy(wall1.quaternion);
+	//torusus animation
+	for(let i = 0 ;i < 8;i++){
+		   Torusus[i].rotation.y += (i+1)*0.005;
+		   Torusus[i].rotation.x += (i+1)*0.005;
+	}
 	//changing light position
 	if(PlayerMesh.position.z > 100 && PlayerMesh.position.z < 300){
 		lightback.position.z = 100;
@@ -697,6 +732,7 @@ function animate(){
 		thirdPlace = 0;
 		fourthPlace = 0;
 		fifthPlace = 0;
+		sixthPlace = 0;
 	}
 	if(PlayerMesh.position.z > 300 && PlayerMesh.position.z < 800){
 		lightback.position.z = 400;
@@ -710,6 +746,7 @@ function animate(){
 		firstPlace = 0;
 		fourthPlace = 0;
 		fifthPlace = 0;
+		sixthPlace = 0;
 	}
 	if(PlayerMesh.position.z > 800 && PlayerMesh.position.z < 1200){
 		lightback.position.z = 800;
@@ -723,6 +760,7 @@ function animate(){
 		firstPlace = 0;
 		fourthPlace = 0;
 		fifthPlace = 0;
+		sixthPlace = 0;
 	}
 	if(PlayerMesh.position.z > 1200 && PlayerMesh.position.z < 1600 ){
 		lightback.position.z = 1200;
@@ -736,6 +774,7 @@ function animate(){
 		firstPlace = 0;
 		thirdPlace = 0;
 		fifthPlace = 0;
+		sixthPlace = 0;
 	}
 	if(PlayerMesh.position.z > 1600){
 		lightback.position.z = 1600;
@@ -749,6 +788,21 @@ function animate(){
 		secondPlace = 0;
 		firstPlace = 0;
 		thirdPlace = 0;
+		sixthPlace = 0;
+	}
+	if(PlayerMesh.position.z > 2000){
+		lightback.position.z = 2000;
+		lightback3.position.z = 2000;
+		if(sixthPlace == 0){
+			sound.play();
+			setTimeout(()=>{sound.stop();},1500);
+		}
+		sixthPlace++;
+		fourthPlace = 0;
+		secondPlace = 0;
+		firstPlace = 0;
+		thirdPlace = 0;
+		fifthPlace = 0;
 	}
 	//Player Controls
 	if(keysPressed.w == true){
